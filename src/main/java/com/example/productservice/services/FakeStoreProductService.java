@@ -6,6 +6,7 @@ import com.example.productservice.models.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,14 +20,20 @@ public class FakeStoreProductService implements ProductService{
     @Override
     public Product getProductById(Long id) {
         FakeStoreProductDto fakeStoreProductDto =
-                restTemplate.getForObject("https://fakestoreapi.com/products/" + id,
-                        FakeStoreProductDto.class);
+                restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
 
         return convertDtoToProduct(fakeStoreProductDto);
     }
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        FakeStoreProductDto[] fakeStoreProductDtoList
+                = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
+
+        List<Product> productList = new ArrayList<>();
+        for(FakeStoreProductDto currentProduct : fakeStoreProductDtoList){
+            productList.add(convertDtoToProduct(currentProduct));
+        }
+        return productList;
     }
 
     @Override
@@ -43,7 +50,11 @@ public class FakeStoreProductService implements ProductService{
 
     @Override
     public Product updateProduct(Long id, Product product) {
-        return null;
+        FakeStoreProductDto fakeStoreProductDto = convertProductToDto(product);
+        fakeStoreProductDto
+                = restTemplate.patchForObject("https://fakestoreapi.com/products/" + id, fakeStoreProductDto, FakeStoreProductDto.class);
+
+        return convertDtoToProduct(fakeStoreProductDto);
     }
 
     @Override

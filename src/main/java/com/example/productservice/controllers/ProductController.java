@@ -1,7 +1,11 @@
 package com.example.productservice.controllers;
 
+import com.example.productservice.dtos.FakeStoreProductDto;
+import com.example.productservice.exceptions.ProductLimitReachedException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -17,13 +21,16 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public Product getProductById(@PathVariable ("id") Long id){
+    public Product getProductById(@PathVariable ("id") Long id) throws ProductLimitReachedException {
+        if(id > 100)
+//        throw new RuntimeException();
+            throw new ProductLimitReachedException();
         return productService.getProductById(id);
     }
 
     @GetMapping("/products")
     public List<Product> getAllProducts(){
-        return new ArrayList<>();
+        return productService.getAllProducts();
     }
 
     @PostMapping("/products")
@@ -38,11 +45,17 @@ public class ProductController {
 
     @PatchMapping("/products/{id}")
     public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product){
-        return new Product();
+        return productService.updateProduct(id, product);
     }
 
     @DeleteMapping("/products/{id}")
     public Product deleteProduct(@PathVariable("id") Long id){
         return new Product();
     }
+
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<String> runtimeExceptionHandler(){
+//        System.out.println("Runtime exception has occurred ");
+//        return new ResponseEntity<>("Runtime exception has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }
