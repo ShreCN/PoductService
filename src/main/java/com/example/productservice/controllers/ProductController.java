@@ -35,7 +35,6 @@ public class ProductController {
 
     @PostMapping("/products")
     public Product createProduct(@RequestBody Product product){
-
         return productService.createProduct(product);
     }
     @PutMapping("/products/{id}")
