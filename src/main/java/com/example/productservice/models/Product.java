@@ -16,4 +16,5 @@ public class Product extends BaseModel {
     @JoinColumn
     private Category category;
     private String description;
+    private Integer quantity;
 }
