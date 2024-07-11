@@ -4,6 +4,7 @@ import com.example.productservice.dtos.FakeStoreProductDto;
 import com.example.productservice.exceptions.ProductLimitReachedException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
+import com.example.productservice.services.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,19 +14,23 @@ import java.util.List;
 
 @RestController
 public class ProductController {
-
     private ProductService productService;
+    private TokenService tokenService;
 
-    public ProductController(ProductService productService){    // Constructor Injection
+    public ProductController(ProductService productService, TokenService tokenService){    // Constructor Injection
         this.productService = productService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("/products/{id}")
-    public Product getProductById(@PathVariable ("id") Long id) throws ProductLimitReachedException {
-        if(id > 100)
-//        throw new RuntimeException();
-            throw new ProductLimitReachedException();
-        return productService.getProductById(id);
+//    public ResponseEntity<Product> getProductById(@RequestHeader("token") String token,  @PathVariable ("id") Long id){
+//        if(!tokenService.validateToken(token)){
+//            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+//        }
+//        return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
+//    }
+    public ResponseEntity<Product> getProductById(@PathVariable ("id") Long id){
+        return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
 
     @GetMapping("/products")
