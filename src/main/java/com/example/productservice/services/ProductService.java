@@ -1,7 +1,9 @@
 package com.example.productservice.services;
 
 import com.example.productservice.models.Product;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface ProductService {
@@ -17,4 +19,7 @@ public interface ProductService {
       Product updateProduct( Long id, Product product);
 
       Product deleteProduct(Long id);
+      Page<Product> searchProduct(int pageNumber, int pageSize);
+
+      void serviceDiscovery();
 }

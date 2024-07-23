@@ -1,15 +1,13 @@
 package com.example.productservice.controllers;
 
-import com.example.productservice.dtos.FakeStoreProductDto;
-import com.example.productservice.exceptions.ProductLimitReachedException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
 import com.example.productservice.services.TokenService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -41,6 +39,20 @@ public class ProductController {
     @PostMapping("/products")
     public Product createProduct(@RequestBody Product product){
         return productService.createProduct(product);
+    }
+
+    @GetMapping("/searchproducts")
+    public Page<Product> searchProduct(@PathVariable("pageNumber") int pageNumber,
+                                       @PathVariable("pageSize") int pageSize){
+//        return productService.searchProduct(pageNumber, pageSize);
+        return null;
+    }
+
+    /* calling user service to test Eureka Service Discovery */
+    @GetMapping("/products/eureka")
+    public void serviceDiscovery(){
+        /* testing Eureka Service Discovery */
+        productService.serviceDiscovery();
     }
     @PutMapping("/products/{id}")
     public Product replaceProduct(@PathVariable("id") Long id, @RequestBody Product product){

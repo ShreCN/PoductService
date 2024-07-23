@@ -1,12 +1,17 @@
 package com.example.productservice.services;
 
 import com.example.productservice.dtos.FakeStoreProductDto;
+import com.example.productservice.dtos.UserResponseDto;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +20,24 @@ import java.util.List;
 public class FakeStoreProductService implements ProductService{
 
     private RestTemplate restTemplate;
+    private RedisTemplate redisTemplate;
 
-    FakeStoreProductService(RestTemplate restTemplate){
+    FakeStoreProductService(RestTemplate restTemplate, RedisTemplate redisTemplate){
         this.restTemplate = restTemplate;
+        this.redisTemplate= redisTemplate;
     }
     @Override
     public Product getProductById(Long id) {
-        FakeStoreProductDto fakeStoreProductDto =
-                restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
+        FakeStoreProductDto fakeStoreProductDto;
+               Product product = (Product) redisTemplate.opsForHash().get("PRODUCTS", "PRODUCTS_"+id);
+        if(product == null){
+            fakeStoreProductDto =
+                    restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
+            product = convertDtoToProduct(fakeStoreProductDto);
+            redisTemplate.opsForHash().put("PRODUCTS", "PRODUCTS_"+id, product);
+        }
 
-        return convertDtoToProduct(fakeStoreProductDto);
+        return product;
     }
     @Override
     public List<Product> getAllProducts() {
@@ -62,6 +75,25 @@ public class FakeStoreProductService implements ProductService{
     @Override
     public Product deleteProduct(Long id) {
         return null;
+    }
+
+    @Override
+    public Page<Product> searchProduct(int pageNumber, int pageSize) {
+//        TODO
+//        return restTemplate.getForObject("https://fakestoreapi.com/products/", Page.class);
+        return null;
+    }
+
+    public void serviceDiscovery(){
+        /* testing Eureka Service Discovery */
+//        try {
+            UserResponseDto userResponseDto =
+                    restTemplate.getForObject("http://UserService/users/eureka", UserResponseDto.class);
+//        } catch (Exception e) {
+////            Throwable cause = e.getCause();
+////            cause.printStackTrace(); // Log the actual cause of the exception
+//            System.out.println(e.toString());
+//        }
     }
 
     private Product convertDtoToProduct(FakeStoreProductDto dto) {
